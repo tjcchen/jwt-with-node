@@ -30,7 +30,7 @@ const generateAccessToken = (user) => {
  * 
  * TODO: access token also need to be cleared
  */
-app.delete('/logout', (req, res) => {
+app.post('/logout', (req, res) => {
   refreshTokens = refreshTokens.filter(token => token !== req.body.token);
   res.sendStatus(204);
 });
