@@ -1,2 +1,2 @@
 # jwt-with-node
-Json Web Token Authorization Project Implemented with NodeJS
+Json Web Token Authentication Project Implemented with NodeJS
