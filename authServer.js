@@ -8,6 +8,51 @@ require('dotenv').config();
 // use json as response
 app.use(express.json());
 
+// we currently store refreshTokens in memory,
+// but in real world, we need to store it DB or cache
+let refreshTokens = [];
+
+/**
+ * Generate access token with expire time
+ */
+const generateAccessToken = (user) => {
+  return jwt.sign(
+    user, // payload
+    process.env.ACCESS_TOKEN_SECRET, // access token secret
+    {
+      expiresIn: '30s' // expires time, we could have a longer expire time in real world, like 15m
+    }
+  );
+};
+
+/**
+ * Generate a new access token if refresh token is valid
+ */
+app.post('/token', (req, res) => {
+  const refreshToken = req.body.token;
+
+  if (refreshToken == null) {
+    return res.sendStatus(401);
+  }
+
+  if (!refreshTokens.includes(refreshToken)) {
+    return res.sendStatus(403);
+  }
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+
+    // regenerate access token
+    const accessToken = generateAccessToken({ name: user.name });
+
+    res.json({
+      accessToken: accessToken
+    });
+  });
+});
+
 /**
  * A JWT token looks like this:
  * {
@@ -32,11 +77,19 @@ app.post('/login', (req, res) => {
   const username = req.body.username;
   const user = { name: username };
 
-  // first parameter is payload information,
-  // second parameter is access_token, we currently sign it with crypto module
-  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-  
-  res.json({ accessToken: accessToken });
+  // generate access token, access token only valid for 30s at this time
+  const accessToken = generateAccessToken(user);
+
+  // generate refresh token
+  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+
+  // put refreshToken into refreshTokens
+  refreshTokens.push(refreshToken);
+
+  res.json({
+    accessToken: accessToken,
+    refreshToken: refreshToken
+  });
 });
 
 app.listen(4000);
