@@ -26,6 +26,16 @@ const generateAccessToken = (user) => {
 };
 
 /**
+ * Logout logic, we need to remove current refresh token
+ * 
+ * TODO: access token also need to be cleared
+ */
+app.delete('/logout', (req, res) => {
+  refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+  res.sendStatus(204);
+});
+
+/**
  * Generate a new access token if refresh token is valid
  */
 app.post('/token', (req, res) => {
