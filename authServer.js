@@ -1,6 +1,6 @@
 const express = require('express');
-const app = express();
-const jwt = require('jsonwebtoken');
+const jwt     = require('jsonwebtoken');
+const app     = express();
 
 // enable dotenv to load environment variables
 require('dotenv').config();
@@ -31,7 +31,10 @@ const generateAccessToken = (user) => {
  * TODO: access token also need to be cleared
  */
 app.post('/logout', (req, res) => {
-  refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+  refreshTokens = refreshTokens.filter(
+    token => token !== req.body.token
+  );
+
   res.sendStatus(204);
 });
 

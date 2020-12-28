@@ -1,6 +1,6 @@
 const express = require('express');
-const app = express();
-const jwt = require('jsonwebtoken');
+const jwt     = require('jsonwebtoken');
+const app     = express();
 
 // enable dotenv to load environment variables
 require('dotenv').config();
